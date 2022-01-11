@@ -1,47 +1,13 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "=2.48.0"
-    }
-  }
+module "dev_cluster" {
+    source       = "./main"
+    env_name     = "dev"
+    cluster_name = "learnk8scluster"
+    instance_type = "standard_d2_v2"
 }
 
-provider "azurerm" {
-  features {}
-}
-
-resource "azurerm_resource_group" "rg" {
-  name     = "learnk8sResourceGroup"
-  location = "northeurope"
-}
-
-resource "azurerm_kubernetes_cluster" "cluster" {
-  name                = "learnk8scluster"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  dns_prefix          = "learnk8scluster"
-
-  default_node_pool {
-    name       = "default"
-    node_count = 2
-    vm_size    = "standard_d2_v2"
-  }
-
-  identity {
-    type = "SystemAssigned"
-  }
-
-  addon_profile {
-    http_application_routing {
-      enabled = true
-    }
-  }
-}
-
-resource "azurerm_kubernetes_cluster_node_pool" "mem" {
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.cluster.id
-  name                  = "mem"
-  node_count            = 1
-  vm_size               = "standard_d11_v2"
+module "prod_cluster" {
+    source       = "./main"
+    env_name     = "prod"
+    cluster_name = "learnk8scluster"
+    instance_type = "standard_d11_v2"
 }
